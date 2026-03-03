@@ -1,0 +1,25 @@
+{
+  "name": "devmingle",
+  "version": "1.0.0",
+  "description": "Tinder for devs",
+  "homepage": "https://github.com/Kanak-dev/DevMingle#readme",
+  "bugs": {
+    "url": "https://github.com/Kanak-dev/DevMingle/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kanak-dev/DevMingle.git"
+  },
+  "license": "ISC",
+  "author": "Kajal Prajapati",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start":"node src/app.js",
+    "dev":"nodemon src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

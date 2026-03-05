@@ -1,14 +1,16 @@
-const express=require('express');
+require("dotenv").config();
 
-const app=express();
+const express = require("express");
+const connectDB = require("./config/db");
 
-app.use("/hello",(req,res)=>{
-    res.send("Hello Cutie");
-})
-app.use("/api",(req,res)=>{
-    res.send("Hello from the server !!!");
-})
+const app = express();
 
-app.listen(3000,()=>{
-    console.log("Server is successfully running on port 3000...")
+connectDB();
+
+app.get("/", (req, res) => {
+  res.send("API Running");
+});
+console.log("ENV:",process.env.MONGO_URI);
+app.listen(5000, () => {
+  console.log("Server running on port 5000");
 });

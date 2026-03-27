@@ -13,7 +13,7 @@ const createUser=async(req,res)=>{
         res.status(201).send("User Added successfully");
     }catch(error){
         console.error("not Added",error);
-        res.status(500).send("Failed to add user");
+        res.status(500).send("Failed to add user :"+error);
     }
 
 }
@@ -56,4 +56,28 @@ const deleteUser=async(req,res)=>{
         res.status(400).send("Something went wrong")
     }
 }
-module.exports={createUser,getUser,feed,deleteUser};
+const updateInfo=async(req,res)=>{
+    const userId=req.params?.userId;
+    const data=req.body;
+
+    try{
+        const ALLOWED_UPDATES=[
+        "userId","photoUrl","about","gender","age"
+        ];
+        const isUpdateAllowed=Object.keys(data).every((k)=>ALLOWED_UPDATES.includes(k));
+
+        if(!isUpdateAllowed){
+            throw new Error("update not allowed")
+        }
+        if(data?.skills.length>20){
+            throw Error("Skills cannot be more than 20...")
+        }
+
+        const user=await User.findByIdAndUpdate({_id:userId},data,{runValidators:true,});
+        res.status(200).send("Information updated successfully");
+    }catch(error){
+        console.log(error);
+        res.status(400).send("Update Failed:"+err.message)
+    }
+}
+module.exports={createUser,getUser,feed,deleteUser,updateInfo};

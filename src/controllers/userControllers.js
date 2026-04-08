@@ -1,14 +1,24 @@
 const User=require("../models/user");
+const {validateSignupData}=require("../utils/validation");
+const bcrypt=require("bcrypt");
 
-const createUser=async(req,res)=>{
-    //creating new instance of user model 
-        const user=new User({
-            firstName: req.body.firstName,
-            lastName: req.body.lastName,
-            emailId: req.body.emailId,
-            password: req.body.password
-        });
+const createUser=async(req,res)=>{ 
     try{
+        //validation of data
+        validateSignupData(req);
+
+        //Encrypting password
+        const {password}=req.body;
+        const saltRound=10;
+        const hashpassword=await bcrypt.hash(password,saltRound);
+        
+        //creating new instance of user model 
+            const user=new User({
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                emailId: req.body.emailId,
+                password: hashpassword
+            });
         await user.save();
         res.status(201).send("User Added successfully");
     }catch(error){
@@ -16,6 +26,25 @@ const createUser=async(req,res)=>{
         res.status(500).send("Failed to add user :"+error);
     }
 
+}
+
+const checkUser=async(req,res)=>{
+    try{
+        const {emailId,password}=req.body;
+        const user=await User.findOne({emailId:emailId});
+        if(!user){
+            throw new Error("Invalid Credentials !!!");
+        }
+        const isPasswordValid=await bcrypt.compare(password,user.password);
+        if(!isPasswordValid){
+            throw new Error("Invalid Credentials !!!");
+        }
+        res.status(200).send("Login Successfull");
+    
+    }catch(error){
+        console.error("Login Failed",error);
+        res.status(400).send("Login Failed :"+error.message);
+    }
 }
 
 const getUser=async(req,res)=>{
@@ -80,4 +109,4 @@ const updateInfo=async(req,res)=>{
         res.status(400).send("Update Failed:"+err.message)
     }
 }
-module.exports={createUser,getUser,feed,deleteUser,updateInfo};
+module.exports={createUser,getUser,feed,deleteUser,updateInfo,checkUser};

@@ -2,6 +2,10 @@ const User=require("../models/user");
 const {validateSignupData}=require("../utils/validation");
 const bcrypt=require("bcrypt");
 
+const jwt=require("jsonwebtoken");
+const { get } = require("mongoose");
+ 
+
 const createUser=async(req,res)=>{ 
     try{
         //validation of data
@@ -35,11 +39,21 @@ const checkUser=async(req,res)=>{
         if(!user){
             throw new Error("Invalid Credentials !!!");
         }
-        const isPasswordValid=await bcrypt.compare(password,user.password);
-        if(!isPasswordValid){
-            throw new Error("Invalid Credentials !!!");
+        const isPasswordValid=await user.validatePassword(password);
+        if(isPasswordValid){
+            //creating a JWT token
+            const token=await user.getJWT();
+            //Add the token to cookie and send the response back to the user
+            console.log(token);
+            res.cookie("token",token,{
+                expires:new Date(Date.now()+8*3600000)
+            });
+            
+            res.status(200).send("Login Successfull");
         }
-        res.status(200).send("Login Successfull");
+        if(!isPasswordValid){
+            throw new Error("Invalid Credentials !!!!!!");
+        }
     
     }catch(error){
         console.error("Login Failed",error);
@@ -47,7 +61,25 @@ const checkUser=async(req,res)=>{
     }
 }
 
-const getUser=async(req,res)=>{
+const getProfile=async(req,res)=>{
+    try{
+        const user=req.user;
+        if(!user){
+            throw new Error("Please Login again");
+        }
+        
+        res.send("Reading cookiessss...."+"   The user is:"+user);
+    }catch(error){
+        res.status(400).send("Error:"+error.message);
+    }
+}
+
+const connectionReq=async(req,res)=>{
+    const user=req.user;
+    console.log("Sending the request.....");
+    res.send(user.firstName+"  Connection request has been sent...")
+}
+const getUserByEmail=async(req,res)=>{
     const userEmail=req.body.emailId;
 
     try{
@@ -106,7 +138,7 @@ const updateInfo=async(req,res)=>{
         res.status(200).send("Information updated successfully");
     }catch(error){
         console.log(error);
-        res.status(400).send("Update Failed:"+err.message)
+        res.status(400).send("Update Failed:"+error.message)
     }
 }
-module.exports={createUser,getUser,feed,deleteUser,updateInfo,checkUser};
+module.exports={createUser,getUserByEmail,connectionReq,feed,deleteUser,updateInfo,checkUser,getProfile};

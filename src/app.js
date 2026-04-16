@@ -1,16 +1,20 @@
 require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db");
-const router =require("./routes/userRoutes");
 const cookieParser=require("cookie-parser");
+
 const authRouter = require("./routes/authRoutes");
+const profileRouter =require("./routes/userRoutes");
 
 const app = express();
-//Middleware to parse JSON
-app.use(express.json());
+
+app.use(express.json());  //Middleware to parse JSON
 app.use(cookieParser()); //for reading the cookies back
 
-app.use("/api", authRouter);
+app.use("/", authRouter);
+app.use("/",profileRouter);
+app.use
+
 app.get("/", (req, res) => {
   res.send("API Running");
 }); 

@@ -4,7 +4,8 @@ const connectDB = require("./config/db");
 const cookieParser=require("cookie-parser");
 
 const authRouter = require("./routes/authRoutes");
-const profileRouter =require("./routes/userRoutes");
+const profileRouter =require("./routes/profileRoutes");
+const connectionRouter = require("./routes/connectionRoutes");
 
 const app = express();
 
@@ -13,7 +14,7 @@ app.use(cookieParser()); //for reading the cookies back
 
 app.use("/", authRouter);
 app.use("/",profileRouter);
-app.use
+app.use("/",connectionRouter);
 
 app.get("/", (req, res) => {
   res.send("API Running");
